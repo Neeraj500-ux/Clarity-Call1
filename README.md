@@ -1,4 +1,4 @@
-# Clarity Call for High-Achieving Women
+# for High-Achieving Women
 
 React + Vite + Tailwind CSS website. Home page (VSL style) plus 7 inside pages, all in the same dark-green and gold design.
 

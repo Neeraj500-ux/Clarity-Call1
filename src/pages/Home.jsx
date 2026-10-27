@@ -1,12 +1,12 @@
-import { useRef, useState } from 'react'
 import { SITE } from '../config'
 import BookButton from '../components/BookButton.jsx'
 import Reveal from '../components/Reveal.jsx'
 import { usePageTitle } from '../components/PolicyPage.jsx'
 
-// Used when SITE.videoEmbedUrl is empty.
-const DUMMY_VIDEO =
-  'https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4'
+// Vimeo video (embed format of https://vimeo.com/1239818657)
+// If SITE.videoEmbedUrl is set in config, that one is used instead.
+const VIMEO_URL =
+  'https://player.vimeo.com/video/1239818657?title=0&byline=0&portrait=0&dnt=1'
 
 const steps = [
   'Book your call above and complete the application carefully.',
@@ -60,74 +60,18 @@ function Check() {
 }
 
 function VideoCard() {
-  const ref = useRef(null)
-  const [playing, setPlaying] = useState(false)
-  const [playError, setPlayError] = useState(false)
-
-  const play = async () => {
-    const video = ref.current
-    if (!video) return
-
-    setPlayError(false)
-
-    try {
-      await video.play()
-    } catch {
-      setPlaying(false)
-      setPlayError(true)
-    }
-  }
+  const src = SITE.videoEmbedUrl || VIMEO_URL
 
   return (
     <div className="home-video-card">
-      {SITE.videoEmbedUrl ? (
-        <iframe
-          src={SITE.videoEmbedUrl}
-          title={`${SITE.name} video`}
-          className="home-video-media"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
-          allowFullScreen
-          loading="lazy"
-        />
-      ) : (
-        <>
-          <video
-            ref={ref}
-            src={DUMMY_VIDEO}
-            className="home-video-media"
-            controls={playing || playError}
-            playsInline
-            preload="metadata"
-            onPlay={() => {
-              setPlaying(true)
-              setPlayError(false)
-            }}
-            onPause={() => setPlaying(false)}
-            onEnded={() => setPlaying(false)}
-          />
-
-          {!playing && !playError && (
-            <button
-              type="button"
-              onClick={play}
-              aria-label="Play video"
-              className="home-video-overlay"
-            >
-              <span className="home-video-play">
-                <svg
-                  width="26"
-                  height="26"
-                  viewBox="0 0 24 24"
-                  fill="currentColor"
-                  aria-hidden="true"
-                >
-                  <path d="M8 5.5v13l11-6.5z" />
-                </svg>
-              </span>
-            </button>
-          )}
-        </>
-      )}
+      <iframe
+        src={src}
+        title={`${SITE.name} video`}
+        className="home-video-media"
+        allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
+        allowFullScreen
+        loading="lazy"
+      />
     </div>
   )
 }
@@ -215,58 +159,7 @@ export default function Home() {
           width: 100%;
           height: 100%;
           border: 0;
-          object-fit: contain;
           background: #000;
-        }
-
-        .home-video-overlay {
-          position: absolute;
-          inset: 0;
-          z-index: 1;
-          display: grid;
-          width: 100%;
-          height: 100%;
-          padding: 0;
-          place-items: center;
-          border: 0;
-          background: rgba(0, 0, 0, 0.22);
-          cursor: pointer;
-          transition: background 200ms ease;
-        }
-
-        .home-video-overlay:hover {
-          background: rgba(0, 0, 0, 0.12);
-        }
-
-        .home-video-overlay:focus-visible {
-          outline: 2px solid #e9d49b;
-          outline-offset: -5px;
-        }
-
-        .home-video-play {
-          display: grid;
-          width: 70px;
-          height: 70px;
-          place-items: center;
-          border: 1px solid rgba(243, 226, 179, 0.65);
-          border-radius: 50%;
-          color: #fff;
-          background: linear-gradient(
-            135deg,
-            #e9d49b 0%,
-            #b48a45 55%,
-            #8a6528 100%
-          );
-          box-shadow: 0 10px 30px -6px rgba(0, 0, 0, 0.7);
-          transition: transform 200ms ease;
-        }
-
-        .home-video-play svg {
-          transform: translateX(2px);
-        }
-
-        .home-video-overlay:hover .home-video-play {
-          transform: scale(1.06);
         }
 
         .home-book-wrap {
@@ -315,29 +208,8 @@ export default function Home() {
             border-radius: 12px;
           }
 
-          .home-video-play {
-            width: 54px;
-            height: 54px;
-          }
-
-          .home-video-play svg {
-            width: 22px;
-            height: 22px;
-          }
-
           .home-book-wrap {
             margin-top: 20px;
-          }
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-          .home-video-overlay,
-          .home-video-play {
-            transition: none;
-          }
-
-          .home-video-overlay:hover .home-video-play {
-            transform: none;
           }
         }
       `}</style>
@@ -385,7 +257,7 @@ export default function Home() {
           </div>
 
           <div
-            className="rise mx-auto mt-7 aspect-video w-full max-w-[576px] overflow-hidden rounded-[20px] border border-gold/70 sm:mt-10 [&>*]:!m-0 [&>*]:!h-full [&>*]:!w-full [&>*]:!max-w-none [&_video]:!h-full [&_video]:!w-full [&_video]:!object-cover [&_iframe]:!h-full [&_iframe]:!w-full"
+            className="rise mx-auto mt-7 aspect-video w-full max-w-[576px] overflow-hidden rounded-[20px] border border-gold/70 sm:mt-10 [&>*]:!m-0 [&>*]:!h-full [&>*]:!w-full [&>*]:!max-w-none [&_iframe]:!h-full [&_iframe]:!w-full"
             style={{ animationDelay: '300ms' }}
           >
             <VideoCard />

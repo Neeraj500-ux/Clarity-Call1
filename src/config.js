@@ -2,7 +2,7 @@
 //  Site settings. Edit the values below; nothing else needs to change.
 // ─────────────────────────────────────────────────────────────
 export const SITE = {
-  name: 'Clarity Call for High-Achieving Women',
+  name: ' Clarity Call for High-Achieving Women',
   shortName: 'Clarity Call',
   legalName: 'Clarity Call',
   year: 2026,
