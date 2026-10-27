@@ -13,7 +13,7 @@ const links = [
 
 export default function Footer() {
   return (
-    <footer className="relative z-10 mt-auto border-t border-gold/50 bg-black/30 px-5 pb-9 pt-9 text-center">
+    <footer className="relative z-10 mt-auto border-t border-gold/50 bg-black px-5 pb-9 pt-9 text-center">
       <nav
         aria-label="Footer"
         className="mx-auto flex max-w-5xl flex-wrap justify-center gap-x-4 gap-y-2 text-[0.88rem]"

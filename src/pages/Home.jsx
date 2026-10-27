@@ -63,11 +63,11 @@ function VideoCard() {
   const src = SITE.videoEmbedUrl || VIMEO_URL
 
   return (
-    <div className="home-video-card">
+    <div className="relative isolate aspect-video w-full overflow-hidden rounded-xl border border-gold/70 bg-black shadow-[0_24px_65px_-28px_rgba(0,0,0,0.8)] sm:rounded-[18px]">
       <iframe
         src={src}
         title={`${SITE.name} video`}
-        className="home-video-media"
+        className="absolute inset-0 block h-full w-full border-0 bg-black"
         allow="autoplay; fullscreen; picture-in-picture; clipboard-write; encrypted-media"
         allowFullScreen
         loading="lazy"
@@ -81,164 +81,39 @@ export default function Home() {
 
   return (
     <>
-      <style>{`
-        .home-hero {
-          padding: 40px 20px 48px;
-          text-align: center;
-        }
-
-        .home-hero-inner {
-          width: 100%;
-          max-width: 960px;
-          margin-inline: auto;
-        }
-
-        .home-main-heading {
-          width: 100%;
-          max-width: 920px;
-          margin: 22px auto 0;
-          font-size: clamp(1.35rem, 3.1vw, 2.25rem);
-          font-weight: 500;
-          line-height: 1.3;
-          letter-spacing: -0.015em;
-          overflow-wrap: break-word;
-        }
-
-        .home-heading-highlight {
-          display: block;
-          margin-top: 3px;
-        }
-
-        .home-guarantee {
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 14px;
-          width: 100%;
-          max-width: 640px;
-          margin: 24px auto 0;
-        }
-
-        .home-guarantee-line {
-          flex: 1 1 0;
-          min-width: 0;
-          height: 1px;
-        }
-
-        .home-guarantee-text {
-          flex: 0 1 auto;
-          min-width: 0;
-          margin: 0;
-          font-size: 14px;
-          font-weight: 600;
-          line-height: 1.5;
-        }
-
-        .home-video-wrap {
-          width: 100%;
-          max-width: 768px;
-          margin: 30px auto 0;
-        }
-
-        .home-video-card {
-          position: relative;
-          isolation: isolate;
-          width: 100%;
-          aspect-ratio: 16 / 9;
-          overflow: hidden;
-          border: 1px solid rgba(201, 164, 93, 0.65);
-          border-radius: 18px;
-          background: #000;
-          box-shadow: 0 24px 65px -28px rgba(0, 0, 0, 0.8);
-        }
-
-        .home-video-media {
-          position: absolute;
-          inset: 0;
-          display: block;
-          width: 100%;
-          height: 100%;
-          border: 0;
-          background: #000;
-        }
-
-        .home-book-wrap {
-          width: 100%;
-          max-width: 768px;
-          margin: 26px auto 0;
-        }
-
-        @media (min-width: 640px) {
-          .home-hero {
-            padding-top: 56px;
-            padding-bottom: 64px;
-          }
-        }
-
-        @media (max-width: 639px) {
-          .home-hero {
-            padding: 30px 16px 38px;
-          }
-
-          .home-main-heading {
-            margin-top: 18px;
-            font-size: clamp(1.25rem, 5.3vw, 1.65rem);
-            line-height: 1.35;
-            letter-spacing: -0.01em;
-          }
-
-          .home-heading-highlight {
-            margin-top: 5px;
-          }
-
-          .home-guarantee {
-            gap: 8px;
-            margin-top: 20px;
-          }
-
-          .home-guarantee-text {
-            font-size: 12px;
-          }
-
-          .home-video-wrap {
-            margin-top: 24px;
-          }
-
-          .home-video-card {
-            border-radius: 12px;
-          }
-
-          .home-book-wrap {
-            margin-top: 20px;
-          }
-        }
-      `}</style>
-
-      <section className="home-hero !px-4 !py-10 sm:!px-6 md:!py-12">
-        <div className="home-hero-inner !mx-auto !flex !w-full !max-w-[1280px] !flex-col !items-center !gap-0">
+      <section className="px-3 pb-10 pt-8 text-center sm:px-6 sm:pb-16 sm:pt-14">
+        <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-0">
           <p
-            className="rise mb-5 inline-flex items-center justify-center gap-2.5 font-serif text-[1.05rem] font-semibold text-gold"
+            className="rise mb-4 inline-flex items-center justify-center gap-2.5 font-serif text-[1rem] font-semibold text-gold sm:mb-5 sm:text-[1.05rem]"
             style={{ animationDelay: '0ms' }}
           >
             <Crown />
             {SITE.name}
           </p>
 
+          {/* Mobile: 3 lines | Desktop (md+): 2 lines */}
           <h1
-            className="rise !m-0 w-full max-w-none text-center font-serif text-[27px] leading-[1.25] text-cream sm:text-[32px] md:text-[2.25vw] xl:text-[29px]"
+            className="rise m-0 w-full max-w-none text-center font-serif text-[5.5vw] leading-[1.3] tracking-[-0.01em] text-cream md:text-[2.4vw] md:leading-[1.25] xl:text-[36px]"
             style={{ animationDelay: '120ms' }}
           >
+            {/* White part: 2 lines on mobile, 1 line on desktop */}
             <span className="block md:whitespace-nowrap">
-              We Hand-Hold High-Achieving Women To Gain Clarity By Clearing
+              <span className="block whitespace-nowrap md:inline">
+                We Hand-Hold High-Achieving
+              </span>{' '}
+              <span className="block whitespace-nowrap md:inline">
+                Women To Gain Clarity By Clearing
+              </span>
             </span>
 
-            <span className="mt-1 block text-gold md:whitespace-nowrap">
+            {/* Gold part: 1 line on all screens */}
+            <span className="block whitespace-nowrap text-gold md:mt-1">
               The Unseen Blocks Holding Them Back
             </span>
           </h1>
 
           <div
-            className="rise mt-6 flex w-full max-w-[500px] items-center justify-center gap-3 sm:gap-4"
+            className="rise mt-5 flex w-full max-w-[500px] items-center justify-center gap-2 sm:mt-6 sm:gap-4"
             style={{ animationDelay: '220ms' }}
           >
             <span
@@ -257,7 +132,7 @@ export default function Home() {
           </div>
 
           <div
-            className="rise mx-auto mt-7 aspect-video w-full max-w-[576px] overflow-hidden rounded-[20px] border border-gold/70 sm:mt-10 [&>*]:!m-0 [&>*]:!h-full [&>*]:!w-full [&>*]:!max-w-none [&_iframe]:!h-full [&_iframe]:!w-full"
+            className="rise mx-auto mt-6 w-full max-w-[576px] sm:mt-10"
             style={{ animationDelay: '300ms' }}
           >
             <VideoCard />
