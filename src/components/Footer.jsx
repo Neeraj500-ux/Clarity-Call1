@@ -1,4 +1,4 @@
-import { Link } from 'react-router-dom'
+import { Link, useLocation } from 'react-router-dom'
 import { SITE } from '../config'
 
 const links = [
@@ -12,6 +12,15 @@ const links = [
 ]
 
 export default function Footer() {
+  const { pathname } = useLocation()
+
+  // Agar user usi page ke link par click kare, tab bhi top par chala jaye
+  const handleClick = (to) => {
+    if (pathname === to) {
+      window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+    }
+  }
+
   return (
     <footer className="relative z-10 mt-auto border-t border-gold/50 bg-black px-5 pb-9 pt-9 text-center">
       <nav
@@ -22,6 +31,7 @@ export default function Footer() {
           <Link
             key={to}
             to={to}
+            onClick={() => handleClick(to)}
             className="whitespace-nowrap text-cream/75 transition-colors hover:text-gold-light focus-visible:text-gold-light focus-visible:outline-none"
           >
             {label}

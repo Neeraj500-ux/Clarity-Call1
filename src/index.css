@@ -7,13 +7,23 @@
     scroll-behavior: smooth;
     -webkit-text-size-adjust: 100%;
     background: #03120d;
+    margin: 0;
+    padding: 0;
   }
   body {
     @apply bg-forest-950 text-cream font-sans antialiased;
     margin: 0;
-    min-height: 100vh;
+    padding: 0;
     overflow-x: hidden;
     text-rendering: optimizeLegibility;
+  }
+  #root {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 0;
   }
   img, svg, video, iframe { max-width: 100%; }
   :focus-visible {
