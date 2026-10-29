@@ -10,6 +10,7 @@ import Terms from './pages/Terms.jsx'
 import Refund from './pages/Refund.jsx'
 import Shipping from './pages/Shipping.jsx'
 import Contact from './pages/Contact.jsx'
+import ThankYou from './pages/ThankYou.jsx'
 
 export default function App() {
   return (
@@ -28,6 +29,7 @@ export default function App() {
           <Route path="/refund" element={<Refund />} />
           <Route path="/shipping" element={<Shipping />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/thank-you" element={<ThankYou />} />
         </Routes>
       </main>
 

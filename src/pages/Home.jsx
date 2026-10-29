@@ -1,7 +1,5 @@
-
 import { useEffect, useRef, useState } from 'react'
 import { SITE } from '../config'
-import BookButton from '../components/BookButton.jsx'
 import Reveal from '../components/Reveal.jsx'
 import { usePageTitle } from '../components/PolicyPage.jsx'
 
@@ -9,8 +7,11 @@ import { usePageTitle } from '../components/PolicyPage.jsx'
 const VIMEO_URL =
   'https://player.vimeo.com/video/1240119109?title=0&byline=0&portrait=0&dnt=1&controls=0&api=1'
 
+// Button opens Razorpay first. After payment, Razorpay redirects to Calendly.
+const PAY_URL = 'https://rzp.io/rzp/zlcsiwye'
+
 const steps = [
-  'Book your call above and fill out the application honestly.',
+  'Click the button above, secure your spot, and then book your call.',
   'I personally review every application and reach out if it feels like the right fit.',
   'If you miss your scheduled call without notice, your spot goes to the next woman on the waitlist.',
   'I take only 6 women a month for private 1:1 work — this is deep work, and I can’t do it at scale.',
@@ -267,12 +268,17 @@ export default function Home() {
             <VideoCard />
           </div>
 
-          {/* BOOKING CTA */}
+          {/* SINGLE CTA: opens Razorpay, then Calendly */}
           <div
             className="rise mx-auto mt-5 w-full max-w-[576px] sm:mt-6"
             style={{ animationDelay: '400ms' }}
           >
-            <BookButton className="!flex !min-h-[54px] !w-full !items-center !justify-center !rounded-[14px] !text-[16px] sm:!text-[18px]" />
+            <a
+              href={PAY_URL}
+              className="flex min-h-[54px] w-full items-center justify-center rounded-[14px] bg-gradient-to-br from-[#e6c987] via-[#c9a45d] to-[#a98539] text-[16px] font-semibold text-black shadow-[0_10px_34px_-8px_rgba(201,164,93,0.8)] transition hover:brightness-110 sm:text-[18px]"
+            >
+              Book Your Call
+            </a>
           </div>
         </div>
       </section>
