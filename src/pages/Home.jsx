@@ -9,11 +9,11 @@ const VIMEO_URL =
 
 /* ------------------------------------------------------------------ */
 /* SETTINGS                                                            */
-/* Flow: Button -> One Last Check -> Razorpay popup (same page)        */
-/*       -> Calendly popup (same page) -> /thank-you                   */
+/* Flow: Button -> One Last Check -> Razorpay popup (same screen)      */
+/*       -> Calendly popup (same screen) -> /thank-you                 */
 /* ------------------------------------------------------------------ */
 
-// Razorpay Dashboard -> Settings -> API Keys -> "Key Id"
+// Razorpay Dashboard -> Account & Settings -> API Keys -> "Key Id"
 // Test: rzp_test_...   |   Live: rzp_live_...
 // Only Key Id here. Never put Key Secret in frontend.
 const RAZORPAY_KEY_ID = 'rzp_test_XXXXXXXXXXXXXX'
@@ -22,9 +22,6 @@ const RAZORPAY_KEY_ID = 'rzp_test_XXXXXXXXXXXXXX'
 const AMOUNT_INR = 49
 
 const CALENDLY_URL = 'https://calendly.com/induravish'
-
-// If Razorpay popup fails to load, send to the old payment link
-const FALLBACK_PAY_URL = 'https://rzp.io/rzp/zlcsiwye'
 
 const GOLD_BUTTON =
   'bg-gradient-to-br from-[#e6c987] via-[#c9a45d] to-[#a98539] shadow-[0_10px_34px_-8px_rgba(201,164,93,0.8)]'
@@ -450,7 +447,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
-  // Calendly popup (same page)
+  // Calendly popup (same screen)
   const openCalendly = useCallback(async () => {
     try {
       await loadCalendly()
@@ -479,13 +476,13 @@ export default function Home() {
     return () => window.removeEventListener('message', onMessage)
   }, [navigate])
 
-  // Razorpay popup (same page)
+  // Razorpay popup (same screen, never leaves the page)
   const startPayment = async () => {
     setError('')
 
     if (!RAZORPAY_KEY_ID || RAZORPAY_KEY_ID.includes('XXXX')) {
       setError(
-        'Razorpay key add nahi hui hai. Home.jsx me RAZORPAY_KEY_ID me apni asli Key Id daalo.'
+        'Razorpay Key Id add nahi hui hai. Home.jsx me RAZORPAY_KEY_ID me apni asli Key Id daalo.'
       )
       return
     }
@@ -495,7 +492,8 @@ export default function Home() {
     try {
       await loadRazorpay()
     } catch {
-      window.location.href = FALLBACK_PAY_URL
+      setLoading(false)
+      setError('Payment window could not load. Check your internet and try again.')
       return
     }
 
@@ -526,7 +524,7 @@ export default function Home() {
       rzp.open()
     } catch {
       setLoading(false)
-      window.location.href = FALLBACK_PAY_URL
+      setError('Could not open payment. Please try again.')
     }
   }
 
