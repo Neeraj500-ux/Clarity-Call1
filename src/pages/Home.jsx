@@ -26,20 +26,6 @@ const CALENDLY_URL = 'https://calendly.com/induravish'
 const GOLD_BUTTON =
   'bg-gradient-to-br from-[#e6c987] via-[#c9a45d] to-[#a98539] shadow-[0_10px_34px_-8px_rgba(201,164,93,0.8)]'
 
-/* Page background: same dark green look as before */
-const PAGE_BG = {
-  backgroundColor: '#04120c',
-  backgroundImage: [
-    // soft green glow at the top centre
-    'radial-gradient(ellipse 70% 55% at 50% 0%, rgba(20, 78, 56, 0.55) 0%, rgba(10, 40, 29, 0.35) 45%, rgba(4, 18, 12, 0) 75%)',
-    // faint concentric rings (the subtle pattern behind the headline)
-    'repeating-radial-gradient(circle at 50% 12%, rgba(201, 164, 93, 0.045) 0px, rgba(201, 164, 93, 0.045) 1px, transparent 1px, transparent 46px)',
-    // base dark green vertical gradient
-    'linear-gradient(180deg, #0a2a1e 0%, #06180f 45%, #030d08 100%)',
-  ].join(', '),
-  backgroundAttachment: 'fixed',
-}
-
 const steps = [
   'Click the button above, confirm you are a fit, and secure your spot.',
   'After payment, book your call on the calendar.',
@@ -48,6 +34,84 @@ const steps = [
   'I take only 6 women a month for private 1:1 work — this is deep work, and I can’t do it at scale.',
   'The next cohort begins 15th August 2026 — only 3 spots left.',
 ]
+
+/* ------------------------------------------------------------------ */
+/* Global page CSS (background + mobile fixes + popup animations)      */
+/* ------------------------------------------------------------------ */
+
+const pageCss = `
+html, body { overflow-x: hidden; max-width: 100%; }
+
+.clarity-page {
+  position: relative;
+  width: 100%;
+  max-width: 100%;
+  min-height: 100vh;
+  min-height: 100svh;
+  overflow-x: hidden;
+  background-color: #04120c;
+  background-image:
+    radial-gradient(ellipse 90% 45% at 50% 0%, rgba(20, 78, 56, 0.55) 0%, rgba(10, 40, 29, 0.35) 45%, rgba(4, 18, 12, 0) 75%),
+    repeating-radial-gradient(circle at 50% 12%, rgba(201, 164, 93, 0.045) 0px, rgba(201, 164, 93, 0.045) 1px, transparent 1px, transparent 46px),
+    linear-gradient(180deg, #0a2a1e 0%, #06180f 45%, #030d08 100%);
+  background-repeat: no-repeat, repeat, no-repeat;
+  /* scroll on mobile (fixed backgrounds cause jank / shifting on phones) */
+  background-attachment: scroll;
+  -webkit-text-size-adjust: 100%;
+}
+
+@media (min-width: 1024px) {
+  .clarity-page { background-attachment: fixed; }
+}
+
+.clarity-page * { min-width: 0; }
+
+/* Headline: same 3-line layout as original; mobile size slightly increased.
+   Do not go above ~5.1vw on phones, the longest line is whitespace-nowrap. */
+.clarity-h1 {
+  font-size: 4.9vw;
+  line-height: 1.3;
+}
+@media (min-width: 480px) { .clarity-h1 { font-size: 5.1vw; } }
+@media (min-width: 640px) { .clarity-h1 { font-size: 4vw; } }
+@media (min-width: 768px) { .clarity-h1 { font-size: 2.4vw; line-height: 1.25; } }
+@media (min-width: 1280px) { .clarity-h1 { font-size: 36px; } }
+
+/* Popup animations */
+@keyframes check-overlay-in { from { opacity: 0 } to { opacity: 1 } }
+@keyframes check-overlay-out { from { opacity: 1 } to { opacity: 0 } }
+@keyframes check-card-in {
+  from { opacity: 0; transform: translateY(24px) scale(0.95); }
+  to   { opacity: 1; transform: translateY(0) scale(1); }
+}
+@keyframes check-card-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to   { opacity: 0; transform: translateY(16px) scale(0.96); }
+}
+.check-overlay-in  { animation: check-overlay-in 0.25s ease-out both; }
+.check-overlay-out { animation: check-overlay-out 0.2s ease-in both; }
+.check-card-in     { animation: check-card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
+.check-card-out    { animation: check-card-out 0.2s ease-in both; }
+@media (prefers-reduced-motion: reduce) {
+  .check-overlay-in, .check-overlay-out,
+  .check-card-in, .check-card-out { animation: none !important; }
+}
+
+/* Popup overlay: safe areas + scroll on short phones / landscape */
+.popup-overlay {
+  padding-top: max(1rem, env(safe-area-inset-top));
+  padding-bottom: max(1rem, env(safe-area-inset-bottom));
+  padding-left: max(1rem, env(safe-area-inset-left));
+  padding-right: max(1rem, env(safe-area-inset-right));
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior: contain;
+}
+.popup-card {
+  margin: auto;
+  max-height: calc(100svh - 2rem);
+  overflow-y: auto;
+}
+`
 
 /* ------------------------------------------------------------------ */
 /* Script loaders (Razorpay + Calendly)                                */
@@ -96,7 +160,12 @@ function loadCalendly() {
 
 function Crown() {
   return (
-    <svg width="26" height="26" viewBox="0 0 32 32" fill="none" aria-hidden="true">
+    <svg
+      viewBox="0 0 32 32"
+      fill="none"
+      aria-hidden="true"
+      className="h-[22px] w-[22px] shrink-0 sm:h-[26px] sm:w-[26px]"
+    >
       <path d="M5 23l2.2-12 6.3 6.2L16 8l2.5 9.2L24.8 11 27 23z" fill="#c9a45d" />
       <rect x="5" y="25" width="22" height="2.6" rx="1.3" fill="#c9a45d" />
     </svg>
@@ -106,7 +175,7 @@ function Crown() {
 function Check() {
   return (
     <span
-      className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold/40 via-gold/20 to-gold/5 text-gold ring-1 ring-gold/70 shadow-[0_0_10px_-1px_rgba(201,164,93,0.6),inset_0_1px_0_rgba(255,255,255,0.2)]"
+      className="mt-[3px] flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold/40 via-gold/20 to-gold/5 text-gold ring-1 ring-gold/70 shadow-[0_0_10px_-1px_rgba(201,164,93,0.6),inset_0_1px_0_rgba(255,255,255,0.2)]"
       aria-hidden="true"
     >
       <svg
@@ -217,11 +286,12 @@ function VideoCard() {
         onClick={toggle}
         aria-label={playing ? 'Pause video' : 'Play video'}
         aria-pressed={playing}
-        className="absolute inset-0 z-10 flex cursor-pointer items-center justify-center border-0 bg-transparent p-0 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-gold"
+        className="absolute inset-0 z-10 flex cursor-pointer items-center justify-center border-0 bg-transparent p-0 [-webkit-tap-highlight-color:transparent] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-[-6px] focus-visible:outline-gold"
       >
         <span
-          className={`flex h-[60px] w-[60px] items-center justify-center rounded-full bg-gradient-to-br from-[#e6c987] via-[#c9a45d] to-[#a98539] shadow-[0_10px_34px_-8px_rgba(201,164,93,0.8),inset_0_1px_0_rgba(255,255,255,0.45)] ring-1 ring-white/20 transition-all duration-300 sm:h-[72px] sm:w-[72px] ${playing ? 'scale-90 opacity-0' : 'scale-100 opacity-100'
-            }`}
+          className={`flex h-[56px] w-[56px] items-center justify-center rounded-full bg-gradient-to-br from-[#e6c987] via-[#c9a45d] to-[#a98539] shadow-[0_10px_34px_-8px_rgba(201,164,93,0.8),inset_0_1px_0_rgba(255,255,255,0.45)] ring-1 ring-white/20 transition-all duration-300 sm:h-[72px] sm:w-[72px] ${
+            playing ? 'scale-90 opacity-0' : 'scale-100 opacity-100'
+          }`}
         >
           {playing ? <PauseIcon /> : <PlayIcon />}
         </span>
@@ -232,7 +302,7 @@ function VideoCard() {
           type="button"
           onClick={toggle}
           aria-label="Pause video"
-          className="absolute bottom-3 right-3 z-20 flex h-10 w-10 items-center justify-center rounded-full border border-white/20 bg-black/50 opacity-0 transition-opacity hover:opacity-100 focus-visible:opacity-100 group-hover:opacity-100"
+          className="absolute bottom-2 right-2 z-20 flex h-11 w-11 items-center justify-center rounded-full border border-white/20 bg-black/50 opacity-100 transition-opacity sm:bottom-3 sm:right-3 md:opacity-0 md:hover:opacity-100 md:focus-visible:opacity-100 md:group-hover:opacity-100"
         >
           <PauseIcon />
         </button>
@@ -244,27 +314,6 @@ function VideoCard() {
 /* ------------------------------------------------------------------ */
 /* Popups                                                              */
 /* ------------------------------------------------------------------ */
-
-const popupCss = `
-@keyframes check-overlay-in { from { opacity: 0 } to { opacity: 1 } }
-@keyframes check-overlay-out { from { opacity: 1 } to { opacity: 0 } }
-@keyframes check-card-in {
-  from { opacity: 0; transform: translateY(24px) scale(0.95); }
-  to   { opacity: 1; transform: translateY(0) scale(1); }
-}
-@keyframes check-card-out {
-  from { opacity: 1; transform: translateY(0) scale(1); }
-  to   { opacity: 0; transform: translateY(16px) scale(0.96); }
-}
-.check-overlay-in  { animation: check-overlay-in 0.25s ease-out both; }
-.check-overlay-out { animation: check-overlay-out 0.2s ease-in both; }
-.check-card-in     { animation: check-card-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) both; }
-.check-card-out    { animation: check-card-out 0.2s ease-in both; }
-@media (prefers-reduced-motion: reduce) {
-  .check-overlay-in, .check-overlay-out,
-  .check-card-in, .check-card-out { animation: none !important; }
-}
-`
 
 const cardBg =
   'linear-gradient(160deg, rgba(14, 58, 42, 0.95) 0%, rgba(8, 30, 22, 0.98) 55%, rgba(10, 24, 19, 0.99) 100%)'
@@ -299,19 +348,19 @@ function LastCheckPopup({ onClose, onContinue, loading, error }) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center overflow-y-auto px-4 py-6 backdrop-blur-sm ${closing ? 'check-overlay-out' : 'check-overlay-in'
-        }`}
+      className={`popup-overlay fixed inset-0 z-50 flex items-start justify-center overflow-y-auto backdrop-blur-sm ${
+        closing ? 'check-overlay-out' : 'check-overlay-in'
+      }`}
       style={{ backgroundColor: 'rgba(2, 12, 8, 0.85)' }}
       onClick={requestClose}
       role="dialog"
       aria-modal="true"
       aria-labelledby="check-title"
     >
-      <style>{popupCss}</style>
-
       <div
-        className={`relative w-full max-w-[480px] rounded-3xl border border-gold/60 p-6 text-left shadow-[0_30px_80px_-30px_rgba(0,0,0,0.95)] sm:p-9 ${closing ? 'check-card-out' : 'check-card-in'
-          }`}
+        className={`popup-card relative w-full max-w-[480px] rounded-2xl border border-gold/60 p-5 text-left shadow-[0_30px_80px_-30px_rgba(0,0,0,0.95)] sm:rounded-3xl sm:p-9 ${
+          closing ? 'check-card-out' : 'check-card-in'
+        }`}
         style={{ background: cardBg }}
         onClick={(e) => e.stopPropagation()}
       >
@@ -319,24 +368,24 @@ function LastCheckPopup({ onClose, onContinue, loading, error }) {
           type="button"
           onClick={requestClose}
           aria-label="Close"
-          className="absolute right-5 top-5 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-2xl leading-none text-cream/80 transition hover:text-cream"
+          className="absolute right-3 top-3 flex h-10 w-10 cursor-pointer items-center justify-center rounded-full border-0 bg-transparent text-2xl leading-none text-cream/80 transition hover:text-cream sm:right-4 sm:top-4"
         >
           ×
         </button>
 
         <h2
           id="check-title"
-          className="m-0 pr-8 font-serif text-[1.8rem] font-semibold leading-tight text-gold sm:text-[2.1rem]"
+          className="m-0 pr-10 font-serif text-[1.55rem] font-semibold leading-tight text-gold sm:text-[2.1rem]"
         >
           One Last Check
         </h2>
 
-        <p className="mt-4 text-[1rem] font-medium leading-relaxed text-cream/95">
+        <p className="mt-3 text-[0.95rem] font-medium leading-relaxed text-cream/95 sm:mt-4 sm:text-[1rem]">
           This is an exclusive program for people who are ready to invest in themselves.
           If that is you, confirm below to book your call.
         </p>
 
-        <label className="mt-5 flex cursor-pointer items-start gap-3 text-[1rem] font-medium leading-relaxed text-cream/95">
+        <label className="mt-4 flex cursor-pointer items-start gap-3 text-[0.95rem] font-medium leading-relaxed text-cream/95 sm:mt-5 sm:text-[1rem]">
           <input
             type="checkbox"
             checked={confirmed}
@@ -350,7 +399,7 @@ function LastCheckPopup({ onClose, onContinue, loading, error }) {
 
         {error && (
           <p
-            className="mt-4 rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-300"
+            className="mt-4 break-words rounded-xl border border-red-400/40 bg-red-500/10 px-4 py-2.5 text-sm text-red-300"
             role="alert"
           >
             {error}
@@ -361,20 +410,21 @@ function LastCheckPopup({ onClose, onContinue, loading, error }) {
           type="button"
           onClick={handleContinue}
           disabled={!confirmed || loading}
-          className={`mt-6 flex min-h-[56px] w-full items-center justify-center rounded-2xl border-0 px-4 text-[16px] font-semibold text-[#0a1a13] transition sm:text-[17px] ${GOLD_BUTTON} ${confirmed && !loading
-            ? 'cursor-pointer hover:brightness-110'
-            : 'cursor-not-allowed opacity-50'
-            }`}
+          className={`mt-5 flex min-h-[54px] w-full items-center justify-center rounded-2xl border-0 px-4 text-[15px] font-semibold text-[#0a1a13] transition sm:mt-6 sm:min-h-[56px] sm:text-[17px] ${GOLD_BUTTON} ${
+            confirmed && !loading
+              ? 'cursor-pointer hover:brightness-110'
+              : 'cursor-not-allowed opacity-50'
+          }`}
         >
           {loading ? 'Opening payment...' : 'Continue to Book Your Call'}
         </button>
 
-        <p className="mt-5 text-center text-[12.5px] leading-relaxed text-cream/70">
+        <p className="mt-4 text-center text-[12px] leading-relaxed text-cream/70 sm:mt-5 sm:text-[12.5px]">
           By continuing, you agree to receive updates about your booking from{' '}
           {SITE.name} on WhatsApp, email and phone.
         </p>
 
-        <p className="mt-3 text-center text-[12.5px] leading-relaxed text-cream/70">
+        <p className="mt-2.5 text-center text-[12px] leading-relaxed text-cream/70 sm:mt-3 sm:text-[12.5px]">
           100% confidential. This is only to ensure the right fit.
         </p>
       </div>
@@ -394,16 +444,14 @@ function PaidPopup({ onBook }) {
 
   return (
     <div
-      className="check-overlay-in fixed inset-0 z-40 flex items-center justify-center overflow-y-auto px-4 py-6 backdrop-blur-sm"
+      className="check-overlay-in popup-overlay fixed inset-0 z-40 flex items-start justify-center overflow-y-auto backdrop-blur-sm"
       style={{ backgroundColor: 'rgba(2, 12, 8, 0.85)' }}
       role="dialog"
       aria-modal="true"
       aria-labelledby="paid-title"
     >
-      <style>{popupCss}</style>
-
       <div
-        className="check-card-in relative w-full max-w-[480px] rounded-3xl border border-gold/60 p-6 text-center shadow-[0_30px_80px_-30px_rgba(0,0,0,0.95)] sm:p-9"
+        className="check-card-in popup-card relative w-full max-w-[480px] rounded-2xl border border-gold/60 p-5 text-center shadow-[0_30px_80px_-30px_rgba(0,0,0,0.95)] sm:rounded-3xl sm:p-9"
         style={{ background: cardBg }}
       >
         <div className="mb-3 flex justify-center">
@@ -412,12 +460,12 @@ function PaidPopup({ onBook }) {
 
         <h2
           id="paid-title"
-          className="m-0 font-serif text-[1.8rem] font-semibold leading-tight text-gold sm:text-[2.1rem]"
+          className="m-0 font-serif text-[1.55rem] font-semibold leading-tight text-gold sm:text-[2.1rem]"
         >
           Payment Received
         </h2>
 
-        <p className="mt-4 text-[1rem] font-medium leading-relaxed text-cream/95">
+        <p className="mt-3 text-[0.95rem] font-medium leading-relaxed text-cream/95 sm:mt-4 sm:text-[1rem]">
           Your spot is secured. Now pick a time for your call. If the calendar
           closed, tap the button below to open it again.
         </p>
@@ -425,7 +473,7 @@ function PaidPopup({ onBook }) {
         <button
           type="button"
           onClick={onBook}
-          className={`mt-6 flex min-h-[56px] w-full cursor-pointer items-center justify-center rounded-2xl border-0 px-4 text-[16px] font-semibold text-[#0a1a13] transition hover:brightness-110 sm:text-[17px] ${GOLD_BUTTON}`}
+          className={`mt-5 flex min-h-[54px] w-full cursor-pointer items-center justify-center rounded-2xl border-0 px-4 text-[15px] font-semibold text-[#0a1a13] transition hover:brightness-110 sm:mt-6 sm:min-h-[56px] sm:text-[17px] ${GOLD_BUTTON}`}
         >
           Pick Your Call Time
         </button>
@@ -529,20 +577,22 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen" style={PAGE_BG}>
+    <div className="clarity-page">
+      <style>{pageCss}</style>
+
       {/* HERO SECTION */}
-      <section className="px-3 pb-10 pt-8 text-center sm:px-6 sm:pb-16 sm:pt-14">
+      <section className="w-full px-4 pb-10 pt-7 text-center sm:px-6 sm:pb-16 sm:pt-14">
         <div className="mx-auto flex w-full max-w-[1280px] flex-col items-center gap-0">
           <p
-            className="rise mb-4 inline-flex items-center justify-center gap-2.5 font-serif text-[1rem] font-semibold text-gold sm:mb-5 sm:text-[1.05rem]"
+            className="rise mb-4 inline-flex max-w-full items-center justify-center gap-2 font-serif text-[0.9rem] font-semibold text-gold sm:mb-5 sm:gap-2.5 sm:text-[1.05rem]"
             style={{ animationDelay: '0ms' }}
           >
             <Crown />
-            {SITE.name}
+            <span className="min-w-0 break-words">{SITE.name}</span>
           </p>
 
           <h1
-            className="rise m-0 w-full max-w-none text-center font-serif text-[5.5vw] leading-[1.3] tracking-[-0.01em] text-cream md:text-[2.4vw] md:leading-[1.25] xl:text-[36px]"
+            className="rise clarity-h1 m-0 w-full max-w-none text-center font-serif tracking-[-0.01em] text-cream"
             style={{ animationDelay: '120ms' }}
           >
             <span className="block md:whitespace-nowrap">
@@ -560,18 +610,18 @@ export default function Home() {
           </h1>
 
           <div
-            className="rise mt-5 flex w-full max-w-[500px] items-center justify-center gap-2 sm:mt-6 sm:gap-4"
+            className="rise mt-5 flex w-full max-w-[500px] items-center justify-center gap-2.5 sm:mt-6 sm:gap-4"
             style={{ animationDelay: '220ms' }}
           >
             <span
-              className="h-px min-w-4 flex-1 bg-gradient-to-r from-transparent to-gold/70"
+              className="h-px min-w-3 flex-1 bg-gradient-to-r from-transparent to-gold/70"
               aria-hidden="true"
             />
-            <p className="m-0 text-center text-[12px] font-semibold leading-relaxed text-gold sm:text-[16px]">
+            <p className="m-0 shrink-0 text-center text-[11.5px] font-semibold leading-snug text-gold min-[380px]:text-[12.5px] sm:text-[16px]">
               Money-Back Guarantee: 100% Risk-Free
             </p>
             <span
-              className="h-px min-w-4 flex-1 bg-gradient-to-l from-transparent to-gold/70"
+              className="h-px min-w-3 flex-1 bg-gradient-to-l from-transparent to-gold/70"
               aria-hidden="true"
             />
           </div>
@@ -595,7 +645,7 @@ export default function Home() {
                 setError('')
                 setPopupOpen(true)
               }}
-              className={`flex min-h-[54px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 text-[16px] font-semibold text-black transition hover:brightness-110 sm:text-[18px] ${GOLD_BUTTON}`}
+              className={`flex min-h-[54px] w-full cursor-pointer items-center justify-center gap-2 rounded-[14px] border-0 px-4 text-[16px] font-semibold text-black transition hover:brightness-110 sm:text-[18px] ${GOLD_BUTTON}`}
             >
               Book Your Call <span aria-hidden="true">→</span>
             </button>
@@ -604,29 +654,29 @@ export default function Home() {
       </section>
 
       {/* HOW TO GET STARTED */}
-      <section className="px-5 pb-20 sm:pb-28" aria-labelledby="get-started">
-        <Reveal className="mx-auto max-w-2xl rounded-3xl border border-gold/20 bg-white/[0.035] p-6 backdrop-blur-[2px] sm:p-10">
+      <section className="w-full px-4 pb-16 sm:px-5 sm:pb-28" aria-labelledby="get-started">
+        <Reveal className="mx-auto w-full max-w-2xl rounded-2xl border border-gold/20 bg-white/[0.035] p-5 text-left backdrop-blur-[2px] sm:rounded-3xl sm:p-10">
           <h2
             id="get-started"
-            className="font-serif text-[1.7rem] font-semibold text-gold sm:text-[2rem]"
+            className="m-0 font-serif text-[1.45rem] font-semibold text-gold sm:text-[2rem]"
           >
             How to get started
           </h2>
 
-          <ul className="mt-6 grid gap-4 p-0">
+          <ul className="m-0 mt-5 grid gap-3.5 p-0 sm:mt-6 sm:gap-4">
             {steps.map((step) => (
               <li
                 key={step}
-                className="flex list-none items-start gap-3.5 text-[1.02rem] leading-relaxed text-cream/90"
+                className="flex list-none items-start gap-3 text-[0.95rem] leading-relaxed text-cream/90 sm:gap-3.5 sm:text-[1.02rem]"
               >
                 <Check />
-                <span className="min-w-0">{step}</span>
+                <span className="min-w-0 break-words">{step}</span>
               </li>
             ))}
 
-            <li className="flex list-none items-start gap-3.5 text-[1.02rem] leading-relaxed text-cream/90">
+            <li className="flex list-none items-start gap-3 text-[0.95rem] leading-relaxed text-cream/90 sm:gap-3.5 sm:text-[1.02rem]">
               <Check />
-              <span className="min-w-0">
+              <span className="min-w-0 break-words">
                 Any questions?{' '}
                 <a className="link-gold break-all" href={`mailto:${SITE.contactEmail}`}>
                   {SITE.contactEmail}
