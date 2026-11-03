@@ -14,8 +14,12 @@ const VIMEO_URL =
 /* ------------------------------------------------------------------ */
 
 // Only the public Key Id lives in the frontend (from .env -> VITE_RAZORPAY_KEY_ID).
-// Key Secret stays on the server (api/ folder). Amount is set in api/create-order.js.
+// Key Secret stays on the server (public/api/config.php). Amount is set in public/api/create-order.php.
 const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID
+
+// PHP endpoints (Anested hosting runs PHP, not Node)
+const API_CREATE_ORDER = '/api/create-order.php'
+const API_VERIFY_PAYMENT = '/api/verify-payment.php'
 
 const CALENDLY_URL = 'https://calendly.com/induravish'
 
@@ -542,7 +546,7 @@ export default function Home() {
     // 1. Create order on the backend
     let order
     try {
-      const r = await fetch('/api/create-order', { method: 'POST' })
+      const r = await fetch(API_CREATE_ORDER, { method: 'POST' })
       const text = await r.text()
       try {
         order = JSON.parse(text)
@@ -568,7 +572,7 @@ export default function Home() {
       handler: async (response) => {
         // 3. Verify signature on the backend
         try {
-          const r = await fetch('/api/verify-payment', {
+          const r = await fetch(API_VERIFY_PAYMENT, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
