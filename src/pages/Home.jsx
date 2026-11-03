@@ -32,7 +32,6 @@ const steps = [
   'I personally review every application and reach out if it feels like the right fit.',
   'If you miss your scheduled call without notice, your spot goes to the next woman on the waitlist.',
   'I take only 6 women a month for private 1:1 work — this is deep work, and I can’t do it at scale.',
-  'The next cohort begins 15th August 2026 — only 3 spots left.',
 ]
 
 /* ------------------------------------------------------------------ */
@@ -392,9 +391,7 @@ function LastCheckPopup({ onClose, onContinue, loading, error }) {
             onChange={(e) => setConfirmed(e.target.checked)}
             className="mt-1 h-5 w-5 shrink-0 cursor-pointer rounded accent-[#c9a45d]"
           />
-          <span>
-            Yes, I am currently earning a monthly income. Yes, I am ready to invest.
-          </span>
+          <span>Yes, I am ready to invest.</span>
         </label>
 
         {error && (

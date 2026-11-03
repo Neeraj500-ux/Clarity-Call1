@@ -9,7 +9,7 @@ if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
 
 $config = require __DIR__ . '/config.php';
 
-// Amount in paise. 49 * 100 = Rs 49. Change to your real price before launch.
+// Amount in paise: 49 * 100 = Rs 49
 $amount = 49 * 100;
 
 if (empty($config['key_id']) || empty($config['key_secret'])) {
