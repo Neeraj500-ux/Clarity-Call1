@@ -13,13 +13,9 @@ const VIMEO_URL =
 /*       -> Calendly popup (same screen) -> /thank-you                 */
 /* ------------------------------------------------------------------ */
 
-// Razorpay Dashboard -> Account & Settings -> API Keys -> "Key Id"
-// Test: rzp_test_...   |   Live: rzp_live_...
-// Only Key Id here. Never put Key Secret in frontend.
-const RAZORPAY_KEY_ID = 'rzp_test_XXXXXXXXXXXXXX'
-
-// Amount in rupees (49 = Rs 49)
-const AMOUNT_INR = 49
+// Only the public Key Id lives in the frontend (from .env -> VITE_RAZORPAY_KEY_ID).
+// Key Secret stays on the server (api/ folder). Amount is set in api/create-order.js.
+const RAZORPAY_KEY_ID = import.meta.env.VITE_RAZORPAY_KEY_ID
 
 const CALENDLY_URL = 'https://calendly.com/induravish'
 
@@ -524,14 +520,12 @@ export default function Home() {
     return () => window.removeEventListener('message', onMessage)
   }, [navigate])
 
-  // Razorpay popup (same screen, never leaves the page)
+  // Razorpay: create order (backend) -> open modal -> verify signature (backend)
   const startPayment = async () => {
     setError('')
 
-    if (!RAZORPAY_KEY_ID || RAZORPAY_KEY_ID.includes('XXXX')) {
-      setError(
-        'Razorpay Key Id add nahi hui hai. Home.jsx me RAZORPAY_KEY_ID me apni asli Key Id daalo.'
-      )
+    if (!RAZORPAY_KEY_ID) {
+      setError('Payment is not configured. Please contact support.')
       return
     }
 
@@ -545,21 +539,61 @@ export default function Home() {
       return
     }
 
+    // 1. Create order on the backend
+    let order
+    try {
+      const r = await fetch('/api/create-order', { method: 'POST' })
+      const text = await r.text()
+      try {
+        order = JSON.parse(text)
+      } catch {
+        throw new Error('Payment server is not running. Start the API server and try again.')
+      }
+      if (!r.ok) throw new Error(order?.error || 'Could not create order')
+    } catch (e) {
+      setLoading(false)
+      setError(e.message || 'Could not start payment. Please try again.')
+      return
+    }
+
+    // 2. Open Razorpay checkout with the order_id
     const options = {
       key: RAZORPAY_KEY_ID,
-      amount: AMOUNT_INR * 100, // paise
-      currency: 'INR',
+      amount: order.amount,
+      currency: order.currency,
+      order_id: order.order_id,
       name: SITE.name,
       description: 'Secure your spot',
       theme: { color: '#c9a45d' },
-      handler: () => {
-        setPopupOpen(false)
-        setLoading(false)
-        setPaid(true)
-        openCalendly()
+      handler: async (response) => {
+        // 3. Verify signature on the backend
+        try {
+          const r = await fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          })
+          const data = await r.json().catch(() => null)
+          if (!r.ok || !data?.success) throw new Error(data?.error || 'Verification failed')
+
+          setPopupOpen(false)
+          setLoading(false)
+          setPaid(true)
+          openCalendly()
+        } catch {
+          setLoading(false)
+          setError(
+            'Payment could not be verified. If money was deducted, contact us with your payment ID: ' +
+              response.razorpay_payment_id
+          )
+        }
       },
       modal: {
-        ondismiss: () => setLoading(false),
+        ondismiss: () => setLoading(false), // user closed the modal
       },
     }
 
