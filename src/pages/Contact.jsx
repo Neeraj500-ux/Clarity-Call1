@@ -1,4 +1,42 @@
-import BookButton from '../components/BookButton.jsx'
+import { useEffect } from 'react'
+
+const CALENDLY_URL = 'https://calendly.com/induravish'
+
+/* Set to true if you want the popup to open automatically when the page loads */
+const AUTO_OPEN_ON_LOAD = false
+
+/* Loads the Calendly popup script once */
+function loadCalendly() {
+  return new Promise((resolve, reject) => {
+    if (window.Calendly) return resolve(window.Calendly)
+
+    if (!document.querySelector('link[data-calendly]')) {
+      const link = document.createElement('link')
+      link.rel = 'stylesheet'
+      link.href = 'https://assets.calendly.com/assets/external/widget.css'
+      link.dataset.calendly = '1'
+      document.head.appendChild(link)
+    }
+
+    let script = document.querySelector('script[data-calendly]')
+    if (!script) {
+      script = document.createElement('script')
+      script.src = 'https://assets.calendly.com/assets/external/widget.js'
+      script.async = true
+      script.dataset.calendly = '1'
+      document.body.appendChild(script)
+    }
+    script.addEventListener('load', () => resolve(window.Calendly))
+    script.addEventListener('error', reject)
+  })
+}
+
+function openCalendly(e) {
+  if (e) e.preventDefault()
+  loadCalendly()
+    .then((Calendly) => Calendly.initPopupWidget({ url: CALENDLY_URL }))
+    .catch(() => window.open(CALENDLY_URL, '_blank', 'noopener,noreferrer'))
+}
 
 /* Same look as the hero: deep green glow + faint gold swirl lines */
 function HeroBackground() {
@@ -73,6 +111,10 @@ const sections = [
 ]
 
 export default function Contact() {
+  useEffect(() => {
+    if (AUTO_OPEN_ON_LOAD) openCalendly()
+  }, [])
+
   return (
     <>
       <HeroBackground />
@@ -121,7 +163,13 @@ export default function Contact() {
             Apply for your Clarity Call. A person on our team will read your application.
           </p>
           <div className="mt-6">
-            <BookButton className="w-full sm:w-auto" />
+            <a
+              href={CALENDLY_URL}
+              onClick={openCalendly}
+              className="inline-flex w-full items-center justify-center rounded-full bg-[#d4b06a] px-8 py-3.5 text-base font-semibold text-[#06140f] shadow-lg shadow-[#d4b06a]/20 transition hover:bg-[#e0c283] focus:outline-none focus-visible:ring-2 focus-visible:ring-[#f6efdd] focus-visible:ring-offset-2 focus-visible:ring-offset-[#06140f] sm:w-auto"
+            >
+              Book a Clarity Call
+            </a>
           </div>
         </div>
       </main>
